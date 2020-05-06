@@ -4,7 +4,6 @@ import {
     withRouter
 } from 'react-router-dom';
 import './AppHeader.css';
-import pollIcon from '../logo.svg';
 import { Layout, Menu, Dropdown, Icon } from 'antd';
 import { Input } from 'antd';
 const Header = Layout.Header;
@@ -99,7 +98,7 @@ function ProfileDropdownMenu(props) {
       overlay={dropdownMenu} 
       trigger={['click']}
       getPopupContainer = { () => document.getElementsByClassName('profile-menu')[0]}>
-      <a className="ant-dropdown-link">
+      <a href="/#" className="ant-dropdown-link">
          <Icon type="user" className="nav-icon" style={{marginRight: 0}} /> <Icon type="down" />
       </a>
     </Dropdown>

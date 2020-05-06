@@ -4,23 +4,18 @@ import {Route,
         Switch
 } from 'react-router-dom'
 import {withRouter} from 'react-router-dom'
-import { getCurrentUser,getNewsPosts } from '../util/APIUtils'
+import { getCurrentUser,getNewsPosts,getComments } from '../util/APIUtils'
 import { ACCESS_TOKEN } from '..//constants';
 import Login from '../user/login/Login';
 import Signup from '../user/signup/Signup';
-//import Profile from '../user/profile/Profile';
 import AppHeader from '../common/AppHeader';
-//import NotFound from '../common/NotFound';
 import LoadingIndicator from '../common/LoadingIndicator';
-//import PrivateRoute from '../common/PrivateRoute';
 import ListNews from '../user/news/NewsPost'
 import Sidebar from '../common/Sidebar'
-import { Layout, notification,Button,Menu } from 'antd';
+import { Layout, notification } from 'antd';
 import CreateNews from '../user/news/createNews';
 const { Content,Sider } = Layout;
-const styless ={
-  width:"600px"
-}
+
 
 
 
@@ -32,7 +27,8 @@ class App extends Component {
       isAuthenticated: false,
       isLoading: false,
       postsFetched: false,
-      posts:[]
+      posts:[],
+      comments:[]
     }
     this.handleLogout = this.handleLogout.bind(this);
     this.loadCurrentUser = this.loadCurrentUser.bind(this);
@@ -45,6 +41,14 @@ class App extends Component {
       duration: 3,
     });    
   }
+  loadComments(){
+    getComments().then(response=>{
+      this.setState({
+        comments:response
+      })
+     //  console.log(response[0]);
+    })
+  }
   loadNewsPosts(){
     // get method getAllNewsPosts()
     getNewsPosts()
@@ -53,10 +57,8 @@ class App extends Component {
         posts:response,
         postsFetched: true
       })
-    //  console.log(response)
-
+      console.log(response)
     })
-    console.log()
   }
 
   loadCurrentUser() {
@@ -79,8 +81,9 @@ class App extends Component {
 
   componentWillMount(){
     this.loadNewsPosts();
-    console.log(this.state.postsFetched)
-    console.log(this.state.posts)
+    this.loadComments();
+    // console.log(this.state.postsFetched)
+    // console.log(this.state.posts)
   }
   componentDidMount() {
     this.loadCurrentUser();
@@ -140,7 +143,11 @@ class App extends Component {
                 </Route> */}
 
 
-               <Route path="/news" render={(props)=> <ListNews postsFetched = {this.state.postsFetched} posts = {this.state.posts} {...props}/>}></Route>
+               <Route path="/news" render={(props)=> <ListNews comments = {this.state.comments}
+                postsFetched = {this.state.postsFetched} 
+                posts = {this.state.posts} 
+                currentUser={this.state.currentUser} 
+                {...props}/>}></Route>
                 <Route path = "/createNews" render={(props)=> <CreateNews visible = {true} {...props}/>}></Route>
               </Switch>
             </div>

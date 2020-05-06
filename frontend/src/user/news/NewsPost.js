@@ -1,56 +1,32 @@
-import React,{Component} from 'react'
+import React,{Component,useState} from 'react'
 import './NewsPost.css'
 import Image from '../images/placeholder.png'
-import { List, Button} from 'antd';
-import {getNewsPosts} from '..//..//util/APIUtils'
+import { Button,Form,Input,Card} from 'antd';
 import LoadingIndicator from '../../common/LoadingIndicator';
+import Demo from '..//news/comment'
+import {addComment} from '..//..//util/APIUtils'
+const { TextArea } = Input;
 
-
-const stylez={
-   // marginTop:"10px",
+const listStyle={
     backgroundColor:"#DCDCDC",
-    
+    marginTop:"65px",
+    marginLeft:"0px" ,
+    width:"550px"   
 }
 
-
 class ListNews extends Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            postovi:[]
-        }
-        this.componentWillMount=this.componentWillMount.bind(this);
-    }
-    componentWillMount(){
-        // this.setState({
-        //     postovi:this.props.posts
-        // })
-        //console.log(this.props.posts)
-
-    }
-    componentDidMount(){
-       // console.log(this.props.posts)
-      //  console.log(this.props.postsFetched)
-    }
-
-   
-   
     render(){
             if(this.props.postsFetched){
-                console.log(this.props.posts[0])
                 return (
-                    <div>
-                    <List
-                        style={stylez}
-                        itemLayout="horizontal"
-                        dataSource={this.props.posts}
-                        renderItem = {item =>
-                        <List.Item><NewsPost posts = {item}/></List.Item>}
-                        />
-                    {/* <List>
-                        <List.Item><NewsPost posts = {this.props.posts[0]}/></List.Item>
-                        <List.Item><NewsPost posts = {this.props.posts[1]}/></List.Item>
-                    </List> */}
+                    <div style = {listStyle}>
+                        {this.props.posts.map((post) => 
+                        <NewsPost 
+                            key={post.id}
+                            post={post} 
+                            comments={post.comments} 
+                            id={post.id} 
+                            currentUser={this.props.currentUser}/>
+                        )}  
                     </div>
                 )
             }
@@ -58,53 +34,69 @@ class ListNews extends Component{
             <LoadingIndicator/>
         )
     }
-
 }
 
-
 class NewsPost extends Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            title:{
-                value:''
-            },
-            content:{
-                value:''
-            },
-            path:{
-                value:''
-            },
-            likes:{
-                value:''
-            }
-        }
-    }
-    handleOnClick(e){
-        e.preventDefault()
-       console.log("neso")
-    }
-    render(){
-        return(
-            <div className="news-container">
-                
-                <div className="content-container">
-                    <h1 className="news-title" >{this.props.posts.title }</h1>
-                    <div className="content">
-                        {this.props.posts.content }
-                    </div>
-                    <img src={Image}  alt="slika"></img>
-                    </div>
-                    
-                    <input className="btn" type="button" value={this.props.posts.likes +  " Likes"}></input>
-                    <input className="btn" type="button" value="Comment" onClick={e=>this.handleOnClick(e)}></input>
-                    <input className="btn" type="button" value="Share" ></input>
-                
-            </div>
+    render(){ 
+        return(   
+            <div>
+            <Card title = {this.props.post.title}
+                  style={{ width: 550 }}>
+                <div>{this.props.post.content}</div><br></br>
+                <div><img src={Image}  alt="slika"></img></div><br></br>
+                <Button >Comment</Button>
+                {this.props.comments.map((comment)=>
+                    <Demo key = {comment.id} comment = {comment}/>)}
+                <CommentForm post_id={this.props.post.id} currentUser={this.props.currentUser}/>
+             </Card>
+             </div>
         )
     }
 }
 
+
+// TODO: functionality to add a comment 
+const CommentForm = (props) => {
+    const [comment, setComment] = useState(0);
+    
+
+    const handleInputChange = (e)=>{
+        const target = e.target;
+        setComment(target.value)
+    }
+    const handleSubmit = (e)=>{
+       // e.preventDefault()
+        const commentPayload = {
+            comment: comment,
+            newsPost : {
+                id:props.post_id
+            },
+            user :{
+                id:props.currentUser.id
+            }
+        }
+       
+         addComment(commentPayload)
+         .then(response => {
+           console.log(response)
+         })
+         console.log(props.currentUser)
+    }
+
+    return(
+        <Form onSubmit={handleSubmit}>
+            <Form.Item>
+                <TextArea 
+                rows={4}
+                onChange={(e) => handleInputChange(e)}  
+                />
+            </Form.Item>
+            <Form.Item>
+                <Button htmlType="submit"  type="primary">
+                    Add Comment
+                </Button>
+            </Form.Item>
+        </Form>
+    )
+}
 export default ListNews;
-
-

@@ -3,6 +3,7 @@ import { API_BASE_URL, ACCESS_TOKEN } from '..//constants';
 const request = (options) => {
     const headers = new Headers({
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
     })
     
     if(localStorage.getItem(ACCESS_TOKEN)) {
@@ -74,5 +75,19 @@ export function createNewsPost(newsPost){
 export function getNewsPosts(){
     return request({
         url: API_BASE_URL + "/fetchPosts"
+    })
+}
+
+export function getComments(){
+    return request({
+        url: API_BASE_URL + "/fetchComments"
+    })
+}
+
+export function addComment(commentPayload){
+    return request({
+        url: API_BASE_URL + "/comment",
+        method:'POST',
+        body: JSON.stringify(commentPayload)
     })
 }

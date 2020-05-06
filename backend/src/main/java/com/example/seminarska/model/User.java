@@ -1,4 +1,5 @@
 package com.example.seminarska.model;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +11,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -25,7 +27,7 @@ import java.io.Serializable;
 
 @Entity
 
-public class User extends AbstractEntity implements Serializable  {
+public class User implements Serializable  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -55,5 +57,17 @@ public class User extends AbstractEntity implements Serializable  {
         this.email = email;
         this.password = password;
     }
+//    @JsonManagedReference(value="user")
+//    @OneToMany(mappedBy = "likeId.user",targetEntity = Like.class)
+//    private Set<Like> like;
+
+    @JsonManagedReference
+    @ManyToMany(mappedBy = "likedByUsers", targetEntity = NewsPost.class)
+    private Set<NewsPost> likedPosts;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "owner", targetEntity = NewsPost.class)
+    private Set<NewsPost> createdPosts;
+
 
 }

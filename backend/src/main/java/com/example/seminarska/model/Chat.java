@@ -9,7 +9,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
+
 
 
 @Getter
@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "CHAT")
 @Entity
-public class Chat extends AbstractEntity implements Serializable {
+public class Chat implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -25,7 +25,8 @@ public class Chat extends AbstractEntity implements Serializable {
 
     private String sentMessage;
 
-    private String recievedMessage;
+    private String receivedMessage;
+    //TODO: enable chat
 
     @ManyToOne(fetch = FetchType.LAZY,optional = false)
     @JoinColumn(name = "sender_id", nullable = false)

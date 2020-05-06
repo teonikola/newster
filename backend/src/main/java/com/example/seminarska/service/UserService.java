@@ -2,6 +2,7 @@ package com.example.seminarska.service;
 
 
 import com.example.seminarska.model.User;
+import com.example.seminarska.payload.UserSummary;
 import com.example.seminarska.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,10 @@ public class UserService {
         if(findUserByUsername(user.getUsername())==null)
              return repo.save(user);
         else return null;
+    }
+    public User getUserById(long id){
+        User user = repo.findById(id);
+        return user;
     }
     public List<User> getAllUsers(){
         return repo.findAll();

@@ -6,6 +6,8 @@ import com.example.seminarska.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CommentService {
 
@@ -14,5 +16,9 @@ public class CommentService {
 
     public void save(Comment comment){
         commentRepository.save(comment);
+    }
+
+    public List<Comment> getAll(){
+        return commentRepository.findAll();
     }
 }
