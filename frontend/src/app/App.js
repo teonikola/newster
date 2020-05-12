@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
-import {Route,
-        Switch
-} from 'react-router-dom'
+import {Route,Switch} from 'react-router-dom'
 import {withRouter} from 'react-router-dom'
-import { getCurrentUser,getNewsPosts,getComments } from '../util/APIUtils'
+import { getCurrentUser,getNewsPosts,getSportsPosts,
+  getPostById,getSciencePosts,getEntertainmentPosts,
+  getOtherPosts } from '../util/APIUtils'
 import { ACCESS_TOKEN } from '..//constants';
 import Login from '../user/login/Login';
 import Signup from '../user/signup/Signup';
@@ -14,7 +14,8 @@ import ListNews from '../user/news/NewsPost'
 import Sidebar from '../common/Sidebar'
 import { Layout, notification } from 'antd';
 import CreateNews from '../user/news/createNews';
-const { Content,Sider } = Layout;
+import Message from '../user/chat/Chat'
+const { Content} = Layout;
 
 
 
@@ -26,9 +27,12 @@ class App extends Component {
       currentUser: null,
       isAuthenticated: false,
       isLoading: false,
-      postsFetched: false,
       posts:[],
-      comments:[]
+      sciencePosts:[],
+      sportsPosts:[],
+      entertainmetnPosts:[],
+      othertPosts:[]
+
     }
     this.handleLogout = this.handleLogout.bind(this);
     this.loadCurrentUser = this.loadCurrentUser.bind(this);
@@ -41,24 +45,86 @@ class App extends Component {
       duration: 3,
     });    
   }
-  loadComments(){
-    getComments().then(response=>{
-      this.setState({
-        comments:response
-      })
-     //  console.log(response[0]);
-    })
-  }
+  
   loadNewsPosts(){
     // get method getAllNewsPosts()
-    getNewsPosts()
-    .then(response=>{
-      this.setState({
-        posts:response,
-        postsFetched: true
+    // getNewsPosts()
+    // .then(response=>{
+    //   this.setState({
+    //     posts:response,
+    //     postsFetched: true
+    //   })
+    //   console.log(response)
+    // })
+    getNewsPosts().then(
+      response=>{response.map((post)=>{
+       // console.log(post)
+        getPostById(post).then(
+          res=> {
+            //console.log(res)
+            this.setState({
+              posts:[...this.state.posts,res]
+            })
+            }
+        )
       })
-      console.log(response)
-    })
+      
+    }
+    )  
+  }
+  fetchSciencePosts(){
+    getSciencePosts().then(
+      response=>{response.map((post)=>{
+        console.log(response)
+        getPostById(post).then(
+          res=>{
+            console.log(res)
+              this.setState({
+                sciencePosts:[...this.state.sciencePosts,res]
+              })
+          }
+        )
+      })}
+    )
+  }
+  fetchSportsPosts(){
+    getSportsPosts().then(
+      response=>{response.map((post)=>{
+        getPostById(post).then(
+          res=>{
+              this.setState({
+                sportsPosts:[...this.state.sportsPosts,res]
+              })
+          }
+        )
+      })}
+    )
+  }
+  fetchEntertainmentPosts(){
+    getEntertainmentPosts().then(
+      response=>{response.map((post)=>{
+        getPostById(post).then(
+          res=>{
+              this.setState({
+                entertainmetnPosts:[...this.state.entertainmetnPosts,res]
+              })
+          }
+        )
+      })}
+    )
+  }
+  fetchOtherPosts(){
+    getOtherPosts().then(
+      response=>{response.map((post)=>{
+        getPostById(post).then(
+          res=>{
+              this.setState({
+                othertPosts:[...this.state.othertPosts,res]
+              })
+          }
+        )
+      })}
+    )
   }
 
   loadCurrentUser() {
@@ -72,6 +138,9 @@ class App extends Component {
         isAuthenticated: true,
         isLoading: false
       });
+      //console.log(response)
+
+      
     }).catch(error => {
       this.setState({
         isLoading: false
@@ -81,13 +150,16 @@ class App extends Component {
 
   componentWillMount(){
     this.loadNewsPosts();
-    this.loadComments();
+    
     // console.log(this.state.postsFetched)
-    // console.log(this.state.posts)
+     //console.log(this.state.posts)
   }
   componentDidMount() {
     this.loadCurrentUser();
-    
+    this.fetchSciencePosts();
+    this.fetchSportsPosts();
+    this.fetchEntertainmentPosts();
+    this.fetchOtherPosts();
    // console.log(this.state.posts)
    // this.loadNewsPosts();
    
@@ -127,14 +199,11 @@ class App extends Component {
           <AppHeader isAuthenticated={this.state.isAuthenticated} 
             currentUser={this.state.currentUser} 
             onLogout={this.handleLogout} />
-            <Sidebar/>
+            <Sidebar isAuthenticated={this.state.isAuthenticated}/>
           <Content className="app-content" >
             <div className="container">
               <Switch>      
-                {/* <Route exact path="/" 
-                  render={(props) => <PollList isAuthenticated={this.state.isAuthenticated} 
-                      currentUser={this.state.currentUser} handleLogout={this.handleLogout} {...props} />}>
-                </Route> */}
+                
                 <Route path="/login" 
                   render={(props) => <Login onLogin={this.handleLogin} {...props} />}></Route>
                 <Route path="/signup" component={Signup}></Route>
@@ -143,18 +212,42 @@ class App extends Component {
                 </Route> */}
 
 
-               <Route path="/news" render={(props)=> <ListNews comments = {this.state.comments}
-                postsFetched = {this.state.postsFetched} 
+               <Route path="/news" render={(props)=> <ListNews 
                 posts = {this.state.posts} 
                 currentUser={this.state.currentUser} 
                 {...props}/>}></Route>
-                <Route path = "/createNews" render={(props)=> <CreateNews visible = {true} {...props}/>}></Route>
+
+                <Route path="/newss" render={(props)=> <Message 
+                posts = {this.state.posts} 
+                currentUser={this.state.currentUser} 
+                {...props}/>}></Route>
+                
+                <Route path = "/createNews" render={(props)=> <CreateNews visible = {true}
+                currentUser={this.state.currentUser}  {...props}/>}></Route>
+                
+                <Route path = "/science" render = {(props)=><ListNews 
+                        posts={this.state.sciencePosts}
+                        currentUser={this.state.currentUser} 
+                        {...props}/>}></Route>
+
+                <Route path = "/sports" render = {(props)=><ListNews 
+                        posts={this.state.sportsPosts}
+                        currentUser={this.state.currentUser} 
+                        {...props}/>}></Route>
+                
+                <Route path = "/entertainment" render = {(props)=><ListNews 
+                        posts={this.state.entertainmetnPosts}
+                        currentUser={this.state.currentUser} 
+                        {...props}/>}></Route>
+                
+                <Route path = "/other" render = {(props)=><ListNews 
+                        posts={this.state.othertPosts}
+                        currentUser={this.state.currentUser} 
+                        {...props}/>}></Route>
               </Switch>
             </div>
            
           </Content>
-              <Sider >
-              </Sider>
           
         </Layout>
        

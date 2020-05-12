@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import { Form, Input, Button, notification} from 'antd';
+import { Form, Input, Button, notification, Radio} from 'antd';
 import "./createNews.css"
 import {createNewsPost}  from '../../util/APIUtils'
 import Modal from 'react-awesome-modal'
@@ -20,6 +20,9 @@ class CreateNews extends Component{
             path:{
                 value:'path'
             },
+            tag:{
+                value:'other'
+            },
             visible:true
         }
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -33,6 +36,7 @@ class CreateNews extends Component{
         const target = event.target;
         const inputName = target.name;
         const inputValue = target.value;
+       //nsole.log(event.target)
         this.setState({
             [inputName] : {
                 value: inputValue,
@@ -43,10 +47,16 @@ class CreateNews extends Component{
 
     handleSubmit(event){
         event.preventDefault();
+        console.log(this.props.currentUser.id)
         const newsPost = {
             title: this.state.title.value,
             content: this.state.content.value,
-            path: this.state.path.value
+            path: this.state.path.value,
+            tag: this.state.tag.value,
+            owner: {
+                id:this.props.currentUser.id
+            }
+            
         };
         createNewsPost(newsPost)
         .then(response => {
@@ -96,7 +106,6 @@ class CreateNews extends Component{
     render(){
         return(
             <Modal visible={this.state.visible} width="400px" effect="fadeInUp" onClickAway={() => this.closeModal()}>
-            
                 <div className="create-content">
                 <h1>Create your post</h1>
                     <Form onSubmit={this.handleSubmit} className="create-form">
@@ -124,7 +133,13 @@ class CreateNews extends Component{
                                 value = {this.state.content.value} 
                                 onChange={(event)=> this.handleInputChange(event,this.validateContent)}/>
                         </FormItem>
-
+                        <FormItem>
+                        <Radio.Group name="tag" onChange={(event)=> this.handleInputChange(event,this.validateContent)}>
+                            <Radio  value="science">Science</Radio>
+                            <Radio  value="sports">Sports</Radio>
+                            <Radio  value="entertainment">Entertainment</Radio>
+                        </Radio.Group>
+                        </FormItem>
                         <FormItem>
                             <Button type="primary"
                             htmlType="button"

@@ -78,6 +78,32 @@ export function getNewsPosts(){
     })
 }
 
+export function getPostById(id){
+    return request({
+        url:API_BASE_URL + `/fetchPost/${id}`
+    })
+}
+
+export function getSciencePosts(){
+    return request({
+        url: API_BASE_URL + "/fetchPosts/science"
+    })
+}
+export function getSportsPosts(){
+    return request({
+        url: API_BASE_URL + "/fetchPosts/sports"
+    })
+}
+export function getEntertainmentPosts(){
+    return request({
+        url: API_BASE_URL + "/fetchPosts/entertainment"
+    })
+}
+export function getOtherPosts(){
+    return request({
+        url: API_BASE_URL + "/fetchPosts/other"
+    })
+}
 export function getComments(){
     return request({
         url: API_BASE_URL + "/fetchComments"
@@ -89,5 +115,20 @@ export function addComment(commentPayload){
         url: API_BASE_URL + "/comment",
         method:'POST',
         body: JSON.stringify(commentPayload)
+    })
+}
+
+export function likePost(postId,user){
+    return request({
+        url:API_BASE_URL + `/likedBy/${postId}`,
+        method:'PUT',
+        body:JSON.stringify(user)
+    })
+}
+export function unlikePost(postId,user){
+    return request({
+        url:API_BASE_URL + `/unlikedBy/${postId}`,
+        method:'PUT',
+        body:JSON.stringify(user)
     })
 }

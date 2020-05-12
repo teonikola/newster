@@ -28,9 +28,9 @@ public class Comment implements Serializable {
 
     private String comment;
 
-    @JsonBackReference
+    //@JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER,optional = false)
-    @JoinColumn(name = "newsPost_id", nullable = false)
+    @JoinColumn(name = "newsPost_newsPostId", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     NewsPost newsPost;
 
