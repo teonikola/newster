@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
     Link,
-    withRouter
+    withRouter,
 } from 'react-router-dom';
 import './AppHeader.css';
 import { Layout, Menu, Dropdown, Icon } from 'antd';
@@ -19,6 +19,11 @@ class AppHeader extends Component {
       if(key === "logout") {
         this.props.onLogout();
       }
+    }
+
+    handleSearch=(value)=>{
+      this.props.headerCallback(value)
+      this.props.history.push("/search")
     }
 
     render() {
@@ -62,7 +67,7 @@ class AppHeader extends Component {
                 selectedKeys={[this.props.location.pathname]}
                 style={{ lineHeight: '64px' }} >
                   <Menu.Item  key="/search">
-              <Search style={{ marginTop: '15px' }} placeholder="input search text" onSearch={value => console.log(value)} enterButton />
+              <Search style={{ marginTop: '15px' }} placeholder="input search text" onSearch={value=>this.handleSearch(value)} enterButton />
             </Menu.Item>
                   {menuItems}
               </Menu>

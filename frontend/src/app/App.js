@@ -18,7 +18,7 @@ import Message from '../user/chat/Chat'
 const { Content} = Layout;
 
 
-
+const initialState = []
 
 class App extends Component {
   constructor(props) {
@@ -31,7 +31,8 @@ class App extends Component {
       sciencePosts:[],
       sportsPosts:[],
       entertainmetnPosts:[],
-      othertPosts:[]
+      othertPosts:[],
+      searchedPosts:[]
 
     }
     this.handleLogout = this.handleLogout.bind(this);
@@ -47,45 +48,28 @@ class App extends Component {
   }
   
   loadNewsPosts(){
-    // get method getAllNewsPosts()
-    // getNewsPosts()
-    // .then(response=>{
-    //   this.setState({
-    //     posts:response,
-    //     postsFetched: true
-    //   })
-    //   console.log(response)
-    // })
     getNewsPosts().then(
       response=>{response.map((post)=>{
-       // console.log(post)
         getPostById(post).then(
           res=> {
-            //console.log(res)
             this.setState({
               posts:[...this.state.posts,res]
             })
-            }
-        )
+         })
       })
-      
-    }
-    )  
+    })  
   }
   fetchSciencePosts(){
     getSciencePosts().then(
       response=>{response.map((post)=>{
-        console.log(response)
         getPostById(post).then(
           res=>{
-            console.log(res)
               this.setState({
                 sciencePosts:[...this.state.sciencePosts,res]
               })
-          }
-        )
-      })}
-    )
+          })
+      })
+    })
   }
   fetchSportsPosts(){
     getSportsPosts().then(
@@ -108,10 +92,9 @@ class App extends Component {
               this.setState({
                 entertainmetnPosts:[...this.state.entertainmetnPosts,res]
               })
-          }
-        )
-      })}
-    )
+          })
+      })
+    })
   }
   fetchOtherPosts(){
     getOtherPosts().then(
@@ -121,10 +104,9 @@ class App extends Component {
               this.setState({
                 othertPosts:[...this.state.othertPosts,res]
               })
-          }
-        )
-      })}
-    )
+          })
+      })
+    })
   }
 
   loadCurrentUser() {
@@ -138,9 +120,6 @@ class App extends Component {
         isAuthenticated: true,
         isLoading: false
       });
-      //console.log(response)
-
-      
     }).catch(error => {
       this.setState({
         isLoading: false
@@ -150,19 +129,16 @@ class App extends Component {
 
   componentWillMount(){
     this.loadNewsPosts();
-    
-    // console.log(this.state.postsFetched)
-     //console.log(this.state.posts)
   }
+
   componentDidMount() {
     this.loadCurrentUser();
     this.fetchSciencePosts();
     this.fetchSportsPosts();
     this.fetchEntertainmentPosts();
     this.fetchOtherPosts();
-   // console.log(this.state.posts)
-   // this.loadNewsPosts();
-   
+    const sorted = this.state.posts.sort((a,b)=>b.createdAt - a.createdAt)
+    console.log(sorted)
   }
 
   handleLogout(redirectTo="/", notificationType="success", description="You're successfully logged out.") {
@@ -190,6 +166,20 @@ class App extends Component {
     this.props.history.push("/news");
   }
 
+  searchCallback = (searchValue) =>{
+    console.log(searchValue)
+    this.setState({
+      searchedPosts:initialState
+    })
+    this.state.posts.map((post)=>{
+      if(post.title.toLowerCase().includes(searchValue.toLowerCase())){
+        this.setState({
+          searchedPosts:[...this.state.searchedPosts,post]
+        })
+      }
+    })
+  }
+
   render() {
     if(this.state.isLoading) {
       return <LoadingIndicator />
@@ -198,7 +188,8 @@ class App extends Component {
         <Layout className="app-container">
           <AppHeader isAuthenticated={this.state.isAuthenticated} 
             currentUser={this.state.currentUser} 
-            onLogout={this.handleLogout} />
+            onLogout={this.handleLogout} 
+            headerCallback={this.searchCallback}/>
             <Sidebar isAuthenticated={this.state.isAuthenticated}/>
           <Content className="app-content" >
             <div className="container">
@@ -207,6 +198,7 @@ class App extends Component {
                 <Route path="/login" 
                   render={(props) => <Login onLogin={this.handleLogin} {...props} />}></Route>
                 <Route path="/signup" component={Signup}></Route>
+
                 {/* <Route path="/users/:username" 
                   render={(props) => <Profile isAuthenticated={this.state.isAuthenticated} currentUser={this.state.currentUser} {...props}  />}>
                 </Route> */}
@@ -242,6 +234,10 @@ class App extends Component {
                 
                 <Route path = "/other" render = {(props)=><ListNews 
                         posts={this.state.othertPosts}
+                        currentUser={this.state.currentUser} 
+                        {...props}/>}></Route>
+                <Route path = "/search" render = {(props)=><ListNews 
+                        posts={this.state.searchedPosts}
                         currentUser={this.state.currentUser} 
                         {...props}/>}></Route>
               </Switch>

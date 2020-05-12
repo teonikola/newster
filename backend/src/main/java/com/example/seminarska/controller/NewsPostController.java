@@ -1,6 +1,5 @@
 package com.example.seminarska.controller;
 
-
 import com.example.seminarska.model.NewsPost;
 import com.example.seminarska.model.User;
 import com.example.seminarska.payload.ApiResponse;

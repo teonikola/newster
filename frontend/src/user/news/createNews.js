@@ -47,7 +47,6 @@ class CreateNews extends Component{
 
     handleSubmit(event){
         event.preventDefault();
-        console.log(this.props.currentUser.id)
         const newsPost = {
             title: this.state.title.value,
             content: this.state.content.value,
@@ -140,11 +139,7 @@ class CreateNews extends Component{
                             <Radio  value="entertainment">Entertainment</Radio>
                         </Radio.Group>
                         </FormItem>
-                        <FormItem>
-                            <Button type="primary"
-                            htmlType="button"
-                            size="large">Choose an image</Button>
-                        </FormItem>
+                       
 
                         <FormItem>
                             <Button type="primary"

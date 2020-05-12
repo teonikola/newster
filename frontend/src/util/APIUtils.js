@@ -64,6 +64,12 @@ export function getCurrentUser() {
         method: 'GET'
     });
 }
+export function getUserById(id){
+    return request({
+        url:API_BASE_URL + `/user/${id}`,
+        method:'GET'
+    })
+}
 export function createNewsPost(newsPost){
     return request({
         url: API_BASE_URL + "/createNewsPost",

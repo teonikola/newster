@@ -1,13 +1,15 @@
-import React, { createElement, useState } from 'react';
+import React, { createElement, useState,useEffect } from 'react';
 import 'antd/dist/antd.css';
 import { Comment, Tooltip, Avatar } from 'antd';
 import moment from 'moment';
 import { DislikeOutlined, LikeOutlined, DislikeFilled, LikeFilled } from '@ant-design/icons';
+import {getUserById} from '..//..//util/APIUtils'
 
 const Demo = (props) => {
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const [action, setAction] = useState(null);
+  const [author,setAuthor] = useState(0)
 
   const like = () => {
     setLikes(1);
@@ -20,8 +22,12 @@ const Demo = (props) => {
     setDislikes(1);
     setAction('disliked');
   };
-  //console.log(props.comment)
- // console.log(props)
+   useEffect(() =>{
+      getUserById(props.comment.user).then(response=>{
+        setAuthor(response.name)
+      })
+  });
+  
   const actions = [
     <span key="comment-basic-like">
       <Tooltip title="Like">
@@ -47,10 +53,11 @@ const Demo = (props) => {
     )
   }
   else{
+   
   return (
     <Comment
       actions={actions}
-      author={<a href="/#">{props.comment.user.name}</a>}
+      author={<a href="/#">{author}</a>}
       avatar={
         <Avatar
           src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"

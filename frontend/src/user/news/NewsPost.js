@@ -1,13 +1,11 @@
 import React,{Component,useState} from 'react'
 import './NewsPost.css'
-import Image from '../images/placeholder.png'
 import { Button,Form,Input,Card,Typography, Row, Col} from 'antd';
-//import LoadingIndicator from '../../common/LoadingIndicator';
 import Demo from '..//news/comment'
 import {addComment,likePost,unlikePost} from '..//..//util/APIUtils'
 import Message from '..//chat/Chat'
 const { TextArea } = Input;
-const { Paragraph } = Typography;
+const { Paragraph,Text } = Typography;
 
 const listStyle={
     backgroundColor:"#DCDCDC",
@@ -19,13 +17,16 @@ const buttonStyle={
     display:"inline-block"
 }
 const noPostsStyle={
-    paddingTop:"300px",
-    paddingLeft:"300px"
+    paddingTop:"100px",
+    paddingLeft:"400px",
+    backgroundColor:"white",
+    fontSize:"30px",
+    fondFamily:"serif"
 }
 class ListNews extends Component{
     render(){
             /* user is logged in */
-            if(this.props.posts===null){
+            if(this.props.posts.length===0){
                 return(
                     <div style={noPostsStyle}>There aren't any post.Please create!</div>
                 )
@@ -74,51 +75,90 @@ class NewsPost extends Component{
         super(props);
         this.state = {
             isLikedByCurrentUser:this.props.isLiked[0],
-            type: (this.props.isLiked[0] ) ? "primary" : "default" 
+            type: (this.props.isLiked[0] ) ? "primary" : "default",
+            commentVisibility:"none",
+            likes:this.props.post.likes,
+            comments:this.props.comments
         }
-        //this.handleLike = this.handleLike().bind(this);
     }
-     handleLike(e){
+   
+     handleLike=(e)=>{
         e.preventDefault()
-        console.log(this.state.isLikedByCurrentUser)
         if(this.state.isLikedByCurrentUser){
+            this.setState({
+                isLikedByCurrentUser:false,
+                type:"default",
+                likes: this.state.likes-1
+            })
               unlikePost(this.props.id,this.props.currentUser)
-            .then(response =>{
-                console.log(response)
-               this.setState({
-                   isLikedByCurrentUser:false
-               })
+            
+            
+        }
+        else{
+            this.setState({
+                isLikedByCurrentUser:true,
+                type:"primary",
+                likes: this.state.likes+1
+            })
+             likePost(this.props.id,this.props.currentUser)
+           
+        }
+    }
+    toggleLike=(e)=>{
+        e.preventDefault()
+        if(this.state.type2==="default"){
+            this.setState({
+                type2:"primary"
             })
         }
         else{
-             likePost(this.props.id,this.props.currentUser)
-            .then(response =>{
-                console.log(response)
-                this.setState({
-                    isLikedByCurrentUser:true
-                })
+            this.setState({
+                type2:"default"
             })
         }
-        console.log(this.state.isLikedByCurrentUser)
+    }
+    toggleComment=(e)=>{
+        e.preventDefault()
+        if(this.state.commentVisibility==="none"){
+            this.setState({
+                commentVisibility:"block"
+            })
+        }
+        else{
+            this.setState({
+                commentVisibility:"none"
+            })
+        }
+    }
+    commentCallback = (comment) =>{
+        this.setState({
+            comments:[...this.state.comments,comment]
+        })
     }
     render(){ 
         return(  
             <div>
             <Card title = {this.props.post.title}
                   style={{ width: 550 }}>
-                <div><Paragraph ellipsis={{ rows: 2, expandable: true }}>
+                    <Text underline>u/{this.props.post.owner.username}  </Text>
+                    <br></br><br></br>
+                <div><Paragraph ellipsis={{ rows: 4, expandable: true }}>
                     {this.props.post.content}
                     </Paragraph>
                 </div><br></br>
-                <div><img src={Image}  alt="slika"></img></div><br></br>
                 <li >
-                    <ul style={buttonStyle}><Button type={this.state.type} onClick={e=>this.handleLike(e)}>Like ({this.props.post.likes})</Button></ul>
-                    <ul style={buttonStyle}><Button >Comment</Button></ul>
-                    <ul style={buttonStyle}><Button >Share</Button></ul>
+                    <ul style={buttonStyle}><Button type={this.state.type} onClick={(e)=>this.handleLike(e)}>Like ({this.state.likes})</Button></ul>
+                    <ul style={buttonStyle}><Button onClick={(e)=>this.toggleComment(e)}>Comment ({this.state.comments.length})</Button></ul>
+                    <ul style={buttonStyle}><Button onClick={()=> window.open("https://www.facebook.com")}>Share</Button></ul>
                 </li> 
-                {this.props.comments.map((comment)=> 
+                <div style={{display:this.state.commentVisibility}}>
+                {this.state.comments.map((comment)=> 
                     <Demo key = {comment.id} comment = {comment}/>)}
-                <CommentForm post_id={this.props.post.newsPostId} currentUser={this.props.currentUser}/>
+                <CommentForm 
+                post_id={this.props.post.newsPostId} 
+                currentUser={this.props.currentUser}
+                newsPostCallback={this.commentCallback}/>
+                </div>
              </Card>
              </div>
         )
@@ -135,34 +175,32 @@ const CommentForm = (props) => {
         setComment(target.value)
     }
     const handleSubmit = (e)=>{
-       // e.preventDefault()
+        e.preventDefault()
         const commentPayload = {
             comment: comment,
             newsPost : {
-                id:props.post_id
+                newsPostId:props.post_id
             },
             user :{
                 id:props.currentUser.id
             }
         }
-       
+        setComment("")
+        props.newsPostCallback(commentPayload)
          addComment(commentPayload)
-         .then(response => {
-           console.log(response)
-         })
-         console.log(props.currentUser)
     }
 
     return(
-        <Form onSubmit={handleSubmit}>
+        <Form >
             <Form.Item>
                 <TextArea 
                 rows={4}
-                onChange={(e) => handleInputChange(e)}  
+                onChange={(e) => handleInputChange(e)}
+                value = {comment}  
                 />
             </Form.Item>
             <Form.Item>
-                <Button htmlType="submit"  type="primary">
+                <Button onClick={(e)=>handleSubmit(e)}  type="primary">
                     Add Comment
                 </Button>
             </Form.Item>

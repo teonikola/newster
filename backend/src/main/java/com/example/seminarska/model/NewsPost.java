@@ -32,7 +32,7 @@ public class NewsPost implements Serializable {
 
     @Size(max = 40)
     private String title;
-
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     private String path;
