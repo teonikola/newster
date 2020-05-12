@@ -7,7 +7,8 @@
 - you can like, comment and share posts on social media and send messages to other users
 
 start the project:
-1.run main located in backend/src/main
-2.npm start located in frontend
+1.create seminarska_db in mysql and connect it to the project
+2.run main located in backend/src/main
+3.npm start located in frontend
 
 *disclaimer: there will be no posts or users which I created as examples because the database is on my computer
